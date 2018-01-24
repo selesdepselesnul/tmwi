@@ -42,4 +42,4 @@
        5000
        #(check-power critical-val sound-path) 
        my-pool))
-    (println "please fill argument, tmwi [critical-value] [path-to-sound]")))
+    (println "Please fill argument, tmwi [critical-value] [path-to-sound]")))
