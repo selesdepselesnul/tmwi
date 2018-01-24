@@ -5,7 +5,7 @@
   (:import (java.io File FileInputStream)
            (javazoom.jl.player Player)))
 
-(def my-pool (at-at/mk-pool))
+(def pool (at-at/mk-pool))
 
 (defn clear-screen []
   (print "\u001b[2J")
@@ -41,5 +41,5 @@
       (at-at/every
        5000
        #(check-power critical-val sound-path) 
-       my-pool))
+       pool))
     (println "Please fill argument, tmwi [critical-value] [path-to-sound]")))
