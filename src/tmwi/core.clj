@@ -18,11 +18,14 @@
 
 (defn -main
   [& args]
-  (at-at/every 5000
-               #(when (is-critical-reached 85)
-                  (let [mp3-stream (FileInputStream.
-                                    (File. "/home/morrisseymarr/siren.mp3"))
-                        mp3-player (Player. mp3-stream)]
-                    (.play mp3-player)
-                    (println "battery is reached critical level")))
-               my-pool))
+  (let [critical-val (first args)
+        sound-path (second args)]
+    (at-at/every
+     5000
+     #(when (is-critical-reached (read-string critical-val))
+        (let [mp3-stream (FileInputStream.
+                          (File. sound-path))
+              mp3-player (Player. mp3-stream)]
+          (println "battery is reached critical level")
+          (.play mp3-player)))
+     my-pool)))
