@@ -13,16 +13,16 @@
            #"\n"
            "")))
 
-(def mp3-stream (FileInputStream. (File. "/home/morrisseymarr/siren.mp3")))
-(def mp3-player (Player. mp3-stream))
-
 (defn is-critical-reached [val]
   (<= (read-bat-capacity) val))
 
 (defn -main
   [& args]
   (at-at/every 5000
-               #(when (is-critical-reached 66)
-                  (.play mp3-player)
-                  (at-at/stop-and-reset-pool! my-pool))
+               #(when (is-critical-reached 85)
+                  (let [mp3-stream (FileInputStream.
+                                    (File. "/home/morrisseymarr/siren.mp3"))
+                        mp3-player (Player. mp3-stream)]
+                    (.play mp3-player)
+                    (println "battery is reached critical level")))
                my-pool))
