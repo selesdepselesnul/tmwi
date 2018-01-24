@@ -35,11 +35,12 @@
 (defn -main
   [& args]
   (clear-screen)
-  (if (= 2 (count args))
+  (if (= 3 (count args))
     (let [critical-val (first args)
-          sound-path (second args)]
+          sound-path (second args)
+          ms-period (last args)]
       (at-at/every
-       5000
+       (read-string ms-period)
        #(check-power critical-val sound-path) 
        pool))
-    (println "Please fill argument, tmwi [critical-value] [path-to-sound]")))
+    (println "Please fill argument, tmwi [critical-value] [path-to-sound] [ms-period]")))
