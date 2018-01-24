@@ -19,6 +19,19 @@
   {:capacity (read-power "capacity")
    :status (read-power "status")})
 
+(defn check-power [critical-val sound-path]
+  (let [{:keys [capacity status]} (get-power)]
+    (if (and (<= (read-string capacity)
+                 (read-string critical-val))
+             (= status "Discharging"))
+      (let [mp3-stream (FileInputStream.
+                        (File. sound-path))
+            mp3-player (Player. mp3-stream)]
+        (println "Battery is reached critical level, please charge it")
+        (.play mp3-player))
+      (println "Safe and sweet"))
+    (clear-screen)))
+
 (defn -main
   [& args]
   (clear-screen)
@@ -27,15 +40,6 @@
           sound-path (second args)]
       (at-at/every
        5000
-       #(let [{:keys [capacity status]} (get-power)]
-          (if (and (<= (read-string capacity) (read-string critical-val))
-                   (= status "Discharging"))
-            (let [mp3-stream (FileInputStream.
-                              (File. sound-path))
-                  mp3-player (Player. mp3-stream)]
-              (println "Battery is reached critical level, please charge it")
-              (.play mp3-player))
-            (println "Safe and sweet"))
-          (clear-screen))
+       #(check-power critical-val sound-path) 
        my-pool))
     (println "please fill argument, tmwi [critical-value] [path-to-sound]")))
