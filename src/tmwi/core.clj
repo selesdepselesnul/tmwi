@@ -1,31 +1,39 @@
 (ns tmwi.core
   (:gen-class)
-  (:require [overtone.at-at :as at-at])
+  (:require [overtone.at-at :as at-at]
+            [clojure.string :as str])
   (:import (java.io File FileInputStream)
            (javazoom.jl.player Player)))
 
 (def my-pool (at-at/mk-pool))
 
-(defn read-bat-capacity []
-  (read-string
-   (clojure.string/replace
-    (slurp "/sys/class/power_supply/BAT1/capacity")
-           #"\n"
-           "")))
+(defn clear-screen []
+  (print "\u001b[2J")
+  (print "\u001B[0;0f"))
 
-(defn is-critical-reached [val]
-  (<= (read-bat-capacity) val))
+(defn read-power [type]
+  (str/trim
+   (slurp (str "/sys/class/power_supply/BAT1/" type))))
+
+(defn get-power []
+  {:capacity (read-power "capacity")
+   :status (read-power "status")})
 
 (defn -main
   [& args]
+  (clear-screen)
   (let [critical-val (first args)
         sound-path (second args)]
     (at-at/every
      5000
-     #(when (is-critical-reached (read-string critical-val))
-        (let [mp3-stream (FileInputStream.
-                          (File. sound-path))
-              mp3-player (Player. mp3-stream)]
-          (println "battery is reached critical level")
-          (.play mp3-player)))
+     #(let [{:keys [capacity status]} (get-power)]
+        (if (and (<= (read-string capacity) (read-string critical-val))
+                   (= status "Discharging"))
+          (let [mp3-stream (FileInputStream.
+                            (File. sound-path))
+                mp3-player (Player. mp3-stream)]
+            (println "Battery is reached critical level, please charging it")
+            (.play mp3-player))
+          (println "Safe and sweet"))
+        (clear-screen))
      my-pool)))
