@@ -28,7 +28,7 @@
      5000
      #(let [{:keys [capacity status]} (get-power)]
         (if (and (<= (read-string capacity) (read-string critical-val))
-                   (= status "Discharging"))
+                 (= status "Discharging"))
           (let [mp3-stream (FileInputStream.
                             (File. sound-path))
                 mp3-player (Player. mp3-stream)]
