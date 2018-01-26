@@ -6,6 +6,7 @@
   (:import (java.io File FileInputStream)
            (javazoom.jl.player Player)))
 
+(def power-supply-path "/sys/class/power_supply/")
 (def pool (at-at/mk-pool))
 
 (defn clear-screen []
@@ -14,7 +15,7 @@
 
 (defn get-bat-dir []
   (->>
-   (.listFiles (io/file "/sys/class/power_supply/"))
+   (.listFiles (io/file power-supply-path))
    (map #(.toString %))
    (filter  #(re-find #"BAT.*" %))
    first))
@@ -52,3 +53,4 @@
        #(check-power critical-val sound-path) 
        pool))
     (println "Please fill argument, tmwi [critical-value] [path-to-sound] [ms-period]")))
+
