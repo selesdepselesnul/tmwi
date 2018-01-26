@@ -14,8 +14,7 @@
 
 (defn get-bat-dir []
   (->>
-   (.. (io/file "/sys/class/power_supply/")
-       listFiles)
+   (.listFiles (io/file "/sys/class/power_supply/"))
    (map #(.toString %))
    (filter  #(re-find #"BAT.*" %))
    first))
