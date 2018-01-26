@@ -1,7 +1,8 @@
 (ns tmwi.core
   (:gen-class)
   (:require [overtone.at-at :as at-at]
-            [clojure.string :as str])
+            [clojure.string :as str]
+            [clojure.java.io :as io])
   (:import (java.io File FileInputStream)
            (javazoom.jl.player Player)))
 
@@ -11,9 +12,17 @@
   (print "\u001b[2J")
   (print "\u001B[0;0f"))
 
+(defn get-bat-dir []
+  (->>
+   (.. (io/file "/sys/class/power_supply/")
+       listFiles)
+   (map #(.toString %))
+   (filter  #(re-find #"BAT.*" %))
+   first))
+
 (defn read-power [type]
   (str/trim
-   (slurp (str "/sys/class/power_supply/BAT1/" type))))
+   (slurp (str (get-bat-dir) "/" type))))
 
 (defn get-power []
   {:capacity (read-power "capacity")
