@@ -2,7 +2,8 @@
   (:gen-class)
   (:require [overtone.at-at :as at-at]
             [clojure.string :as str]
-            [clojure.java.io :as io])
+            [clojure.java.io :as io]
+            [clojure.tools.cli :as cli])
   (:import (java.io File FileInputStream)
            (javazoom.jl.player Player)))
 
@@ -41,16 +42,24 @@
       (println "Safe and sweet"))
     (clear-screen)))
 
+(def cli-options
+  [["-l" "--low-path low path" "Low Path"]
+   ["-c" "--critical critical val" "ciritical val"]
+   ["-p" "--period period" "period check"]
+   ["-h" "--help"]])
+
 (defn -main
   [& args]
   (clear-screen)
-  (if (= 3 (count args))
-    (let [critical-val (first args)
-          sound-path (second args)
-          ms-period (last args)]
+  (let [options (:options (cli/parse-opts args cli-options))
+        low-path (:low-path options)
+        critical (:critical options)
+        period (:period options)]
+    (if (some nil? [low-path critical period])
+      (println "Please fill the argument")
       (at-at/every
-       (read-string ms-period)
-       #(check-power critical-val sound-path) 
-       pool))
-    (println "Please fill argument, tmwi [critical-value] [path-to-sound] [ms-period]")))
+       (read-string period)
+       #(check-power critical low-path) 
+       pool))))
+
 
