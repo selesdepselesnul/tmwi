@@ -58,6 +58,10 @@
 
 (def powers (atom []))
 
+(defmacro when-not-any-nil [col body]
+  `(when (not-any? nil? ~col)
+    ~body))
+
 (defn -main
   [& args]  
   (let [options (:options (cli/parse-opts args cli-options))
@@ -67,7 +71,7 @@
         maximum (:maximum options)
         period (:period options)
         swap-powers! (fn [x] (swap! powers conj x))]
-    (when (not-any? nil? [low-path critical])
+    (when-not-any-nil [low-path critical]
       (swap-powers! 
        { :val critical
          :path low-path
@@ -75,7 +79,7 @@
          :message "Battery is reached minimum level, please charge it"
          :comparer-f <=
        }))
-    (when (not-any? nil? [high-path maximum])
+    (when-not-any-nil [high-path maximum]
       (swap-powers!
        { :val maximum
          :path high-path
