@@ -77,16 +77,14 @@
          :path low-path
          :status "Discharging"
          :message "Battery is reached minimum level, please charge it"
-         :pred <=
-       }))
+         :pred <= }))
     (when-not-any-nil [high-path maximum]
       (swap-powers!
        { :val maximum
          :path high-path
          :status "Charging"
          :message "Battery is reached maximum level, please unplug power"
-         :pred >=
-       }))
+         :pred >= }))
     (if (and (> (count @powers) 0)
              (not (nil? period)))
       (do
