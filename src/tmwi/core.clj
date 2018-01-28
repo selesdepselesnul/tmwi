@@ -29,13 +29,6 @@
   {:capacity (read-power "capacity")
    :current-status (read-power "status")})
 
-;;m =>
-;;{ :val val
-;;  :path path
-;;  :status status
-;;  :message message
-;;  :comparer-f comparer-f
-;;}
 (defn check-power
   [{:keys [val path status message pred]}]
   (let [{:keys [capacity current-status]} (get-power)]
