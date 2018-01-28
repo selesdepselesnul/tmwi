@@ -46,8 +46,7 @@
                         (File. path))
             mp3-player (Player. mp3-stream)]
         (println message)
-        (.play mp3-player)
-        true))))
+        (.play mp3-player)))))
 
 (def cli-options
   [["-l" "--low-path low path" "low path"]
