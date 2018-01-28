@@ -59,8 +59,7 @@
 (def powers (atom []))
 
 (defn -main
-  [& args]
-  
+  [& args]  
   (let [options (:options (cli/parse-opts args cli-options))
         low-path (:low-path options)
         high-path (:high-path options)
