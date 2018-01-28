@@ -27,7 +27,7 @@
 
 (defn get-power []
   {:capacity (read-power "capacity")
-   :status (read-power "status")})
+   :current-status (read-power "status")})
 
 ;;m =>
 ;;{ :val val
@@ -36,15 +36,16 @@
 ;;  :message message
 ;;  :comparer-f comparer-f
 ;;}
-(defn check-power [m]
-  (let [{:keys [capacity status]} (get-power)]
-    (when (and ((:comparer-f m) (read-string capacity)
-                              (read-string (:val m)))  
-             (= status (:status m)))
+(defn check-power
+  [{:keys [val path status message comparer-f]}]
+  (let [{:keys [capacity current-status]} (get-power)]
+    (when (and (comparer-f (read-string capacity)
+                           (read-string val))  
+               (= current-status status))
       (let [mp3-stream (FileInputStream.
-                        (File. (:path m)))
+                        (File. path))
             mp3-player (Player. mp3-stream)]
-        (println (:message m))
+        (println message)
         (.play mp3-player)
         true))))
 
