@@ -37,10 +37,10 @@
 ;;  :comparer-f comparer-f
 ;;}
 (defn check-power
-  [{:keys [val path status message comparer-f]}]
+  [{:keys [val path status message pred]}]
   (let [{:keys [capacity current-status]} (get-power)]
-    (when (and (comparer-f (read-string capacity)
-                           (read-string val))  
+    (when (and (pred (read-string capacity)
+                     (read-string val))  
                (= current-status status))
       (let [mp3-stream (FileInputStream.
                         (File. path))
@@ -77,7 +77,7 @@
          :path low-path
          :status "Discharging"
          :message "Battery is reached minimum level, please charge it"
-         :comparer-f <=
+         :pred <=
        }))
     (when-not-any-nil [high-path maximum]
       (swap-powers!
@@ -85,7 +85,7 @@
          :path high-path
          :status "Charging"
          :message "Battery is reached maximum level, please unplug power"
-         :comparer-f >=
+         :pred >=
        }))
     (if (and (> (count @powers) 0)
              (not (nil? period)))
