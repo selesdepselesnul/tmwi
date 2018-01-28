@@ -60,7 +60,7 @@
 
 (defn -main
   [& args]
-  (clear-screen)
+  
   (let [options (:options (cli/parse-opts args cli-options))
         low-path (:low-path options)
         high-path (:high-path options)
@@ -86,11 +86,13 @@
        }))
     (if (and (> (count @powers) 0)
              (not (nil? period)))
-      (at-at/every
-       (read-string period)
-       #(doseq [x @powers]
-          (check-power x)) 
-       pool)
+      (do
+        (clear-screen)
+        (at-at/every
+          (read-string period)
+          #(doseq [x @powers]
+             (check-power x)) 
+          pool))
       (println "Please fill the argument"))))
 
 
