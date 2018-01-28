@@ -73,9 +73,9 @@
        { :val critical
          :path low-path
          :status "Discharging"
-         :message "Battery is reached critical level, please charge it"
+         :message "Battery is reached minimum level, please charge it"
          :comparer-f <=
-        }))
+       }))
     (when (not-any? nil? [high-path maximum])
       (swap-powers!
        { :val maximum
@@ -83,7 +83,7 @@
          :status "Charging"
          :message "Battery is reached maximum level, please unplug power"
          :comparer-f >=
-        }))
+       }))
     (if (and (> (count @powers) 0)
              (not (nil? period)))
       (at-at/every
