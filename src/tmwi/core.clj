@@ -29,37 +29,68 @@
   {:capacity (read-power "capacity")
    :status (read-power "status")})
 
-(defn check-power [critical-val sound-path]
+;;m =>
+;;{ :val val
+;;  :path path
+;;  :status status
+;;  :message message
+;;  :comparer-f comparer-f
+;;}
+(defn check-power [m]
   (let [{:keys [capacity status]} (get-power)]
-    (if (and (<= (read-string capacity)
-                 (read-string critical-val))
-             (= status "Discharging"))
+    (when (and ((:comparer-f m) (read-string capacity)
+                              (read-string (:val m)))  
+             (= status (:status m)))
       (let [mp3-stream (FileInputStream.
-                        (File. sound-path))
+                        (File. (:path m)))
             mp3-player (Player. mp3-stream)]
-        (println "Battery is reached critical level, please charge it")
-        (.play mp3-player))
-      (println "Safe and sweet"))
-    (clear-screen)))
+        (println (:message m))
+        (.play mp3-player)
+        true))))
 
 (def cli-options
-  [["-l" "--low-path low path" "Low Path"]
+  [["-l" "--low-path low path" "low path"]
+   ["-f" "--high-path high path" "high path"]
+   ["-m" "--maximum maximum val" "maximum val"]
    ["-c" "--critical critical val" "ciritical val"]
    ["-p" "--period period" "period check"]
    ["-h" "--help"]])
+
+(def powers (atom []))
 
 (defn -main
   [& args]
   (clear-screen)
   (let [options (:options (cli/parse-opts args cli-options))
         low-path (:low-path options)
+        high-path (:high-path options)
         critical (:critical options)
-        period (:period options)]
-    (if (some nil? [low-path critical period])
-      (println "Please fill the argument")
+        maximum (:maximum options)
+        period (:period options)
+        swap-powers! (fn [x] (swap! powers conj x))]
+    (when (not-any? nil? [low-path critical])
+      (swap-powers! 
+       { :val critical
+         :path low-path
+         :status "Discharging"
+         :message "Battery is reached critical level, please charge it"
+         :comparer-f <=
+        }))
+    (when (not-any? nil? [high-path maximum])
+      (swap-powers!
+       { :val maximum
+         :path high-path
+         :status "Charging"
+         :message "Battery is reached maximum level, please unplug power"
+         :comparer-f >=
+        }))
+    (if (and (> (count @powers) 0)
+             (not (nil? period)))
       (at-at/every
        (read-string period)
-       #(check-power critical low-path) 
-       pool))))
+       #(doseq [x @powers]
+          (check-power x)) 
+       pool)
+      (println "Please fill the argument"))))
 
 
