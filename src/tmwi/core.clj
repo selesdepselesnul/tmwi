@@ -18,7 +18,7 @@
   (->>
    (.listFiles (io/file power-supply-path))
    (map #(.toString %))
-   (filter  #(re-find #"BAT.*" %))
+   (filter #(re-find #"BAT.*" %))
    first))
 
 (defn read-power [type]
